@@ -1,3 +1,20 @@
+class Config
+{
+public:
+	class General
+	{
+	public:
+		inline static DKUtil::Alias::Boolean bShowMessage{ "bShowMessage", "General" };
+	};
+
+	static void Load()
+	{
+		static auto MainConfig = COMPILE_PROXY("BakaKillMyGames.ini");
+		MainConfig.Bind(General::bShowMessage, true);
+		MainConfig.Load();
+	}
+};
+
 class Hooks
 {
 public:
@@ -145,32 +162,33 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 
 	INFO("{} v{} preloaded"sv, Plugin::NAME, Plugin::Version);
 
+	Config::Load();
 	Hooks::SetPath();
 
-	PWSTR folderPath{ nullptr };
-	if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK)
-	{
-		auto path = std::filesystem::path{ folderPath };
-		path /= "My Games/Starfield/Data/"sv;
+	if (*Config::General::bShowMessage) {
+		PWSTR folderPath{ nullptr };
+		if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK) {
+			auto path = std::filesystem::path{ folderPath };
+			path /= "My Games/Starfield/Data/"sv;
 
-		if (std::filesystem::exists(path))
-		{
-			auto data = std::filesystem::path{ Hooks::GetPath() };
-			data /= "Data"sv;
+			if (std::filesystem::exists(path)) {
+				auto data = std::filesystem::path{ Hooks::GetPath() };
+				data /= "Data"sv;
 
-			static constexpr auto MessageText = std::string_view{
-				"\n\nA Data folder has been detected in Starfield's \"My Games\" folder."sv
-				"\n\nWith this mod installed, the Data folder in Starfield's \"My Games\" folder is disabled. Files located there will not load, including Photo Mode photos shown in the Photo Gallery and during Load Screens."sv
-				"\n\nThe path to this folder is:\n{}\n\nCopy any files contained in that Data folder to the game's Data folder, then delete the Data folder in \"My Games\"."sv
-				"\n\nThe path to the game's Data folder is: \n{}"sv
-				"\n\nWhen you have successfully done this, this message will stop appearing, and you will be able to launch the game."sv
-			};
+				static constexpr auto MessageText = std::string_view{
+					"\n\nA Data folder has been detected in Starfield's \"My Games\" folder."sv
+					"\n\nWith this mod installed, the Data folder in Starfield's \"My Games\" folder is disabled. Files located there will not load, including Photo Mode photos shown in the Photo Gallery and during Load Screens."sv
+					"\n\nThe path to this folder is:\n{}\n\nCopy any files contained in that Data folder to the game's Data folder, then delete the Data folder in \"My Games\"."sv
+					"\n\nThe path to the game's Data folder is: \n{}"sv
+					"\n\nWhen you have successfully done this, this message will stop appearing, and you will be able to launch the game."sv
+				};
 
-			auto msg = fmt::format(
-				MessageText,
-				path.make_preferred().string(),
-				data.make_preferred().string());
-			REL::stl::report_and_fail(msg);
+				auto msg = fmt::format(
+					MessageText,
+					path.make_preferred().string(),
+					data.make_preferred().string());
+				REL::stl::report_and_fail(msg);
+			}
 		}
 	}
 }
