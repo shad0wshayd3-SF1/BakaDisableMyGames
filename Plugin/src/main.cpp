@@ -10,7 +10,7 @@ public:
 	static void Load()
 	{
 		static auto MainConfig = COMPILE_PROXY("BakaKillMyGames.ini");
-		MainConfig.Bind(General::bMO2Compatibility, true);
+		MainConfig.Bind(General::bMO2Compatibility, false);
 		MainConfig.Load();
 	}
 };
@@ -165,7 +165,7 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 	Config::Load();
 	Hooks::SetPath();
 
-	if (*Config::General::bMO2Compatibility) {
+	if (!(*Config::General::bMO2Compatibility)) {
 		PWSTR folderPath{ nullptr };
 		if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK) {
 			auto path = std::filesystem::path{ folderPath };
