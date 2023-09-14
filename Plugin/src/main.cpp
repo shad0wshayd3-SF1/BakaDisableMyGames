@@ -4,13 +4,13 @@ public:
 	class General
 	{
 	public:
-		inline static DKUtil::Alias::Boolean bShowMessage{ "bShowMessage", "General" };
+		inline static DKUtil::Alias::Boolean bMO2Compatibility{ "bMO2Compatibility", "General" };
 	};
 
 	static void Load()
 	{
 		static auto MainConfig = COMPILE_PROXY("BakaKillMyGames.ini");
-		MainConfig.Bind(General::bShowMessage, true);
+		MainConfig.Bind(General::bMO2Compatibility, true);
 		MainConfig.Load();
 	}
 };
@@ -20,15 +20,15 @@ class Hooks
 public:
 	static void Install()
 	{
-		hkPhotoModePath<0x01FC0880, 0x082>::Install();
-		hkPhotoModePath<0x0218CF50, 0x31E>::Install();
-		hkPhotoModePath<0x0218E5F0, 0x29F>::Install();
-		hkPhotoModePath<0x0218F59C, 0x023>::Install();
+		hkPhotoModePath<0x01FC0850, 0x082>::Install();
+		hkPhotoModePath<0x0218CF20, 0x31E>::Install();
+		hkPhotoModePath<0x0218E5C0, 0x29F>::Install();
+		hkPhotoModePath<0x0218F56C, 0x023>::Install();
 
-		hkMessageOfTheDayPath<0x02073140, 0x2C1>::Install();
-		hkMessageOfTheDayPath<0x02073AC0, 0x14B>::Install();
+		hkMessageOfTheDayPath<0x02073110, 0x2C1>::Install();
+		hkMessageOfTheDayPath<0x02073A90, 0x14B>::Install();
 
-		hkDisableLooseFileLocation<0x034BAAC0, 0x172>::Install();
+		hkDisableLooseFileLocation<0x034BB390, 0x172>::Install();
 	}
 
 	static void SetPath()
@@ -165,7 +165,7 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 	Config::Load();
 	Hooks::SetPath();
 
-	if (*Config::General::bShowMessage) {
+	if (*Config::General::bMO2Compatibility) {
 		PWSTR folderPath{ nullptr };
 		if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK) {
 			auto path = std::filesystem::path{ folderPath };
@@ -181,6 +181,7 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 					"\n\nThe path to this folder is:\n{}\n\nCopy any files contained in that Data folder to the game's Data folder, then delete the Data folder in \"My Games\"."sv
 					"\n\nThe path to the game's Data folder is: \n{}"sv
 					"\n\nWhen you have successfully done this, this message will stop appearing, and you will be able to launch the game."sv
+					"\n\nIf you are using MO2, but still want to use this mod, set bMO2Compatibility in this mod's .ini file to true."sv
 				};
 
 				auto msg = fmt::format(
