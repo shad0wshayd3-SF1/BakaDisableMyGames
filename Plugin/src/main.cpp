@@ -20,15 +20,15 @@ class Hooks
 public:
 	static void Install()
 	{
-		hkPhotoModePath<0x01FC0280, 0x082>::Install();
-		hkPhotoModePath<0x0218FA50, 0x31E>::Install();
-		hkPhotoModePath<0x021910F0, 0x29F>::Install();
-		hkPhotoModePath<0x0219209C, 0x023>::Install();
+		hkPhotoModePath<130787, 0x082>::Install();
+		hkPhotoModePath<139670, 0x31E>::Install();
+		hkPhotoModePath<139689, 0x29F>::Install();
+		hkPhotoModePath<139722, 0x023>::Install();
 
-		hkMessageOfTheDayPath<0x02074310, 0x2C1>::Install();
-		hkMessageOfTheDayPath<0x02074C90, 0x14B>::Install();
+		hkMessageOfTheDayPath<134324, 0x2C1>::Install();
+		hkMessageOfTheDayPath<134326, 0x14B>::Install();
 
-		hkDisableLooseFileLocation<0x034BEE90, 0x172>::Install();
+		hkDisableLooseFileLocation<211739, 0x172>::Install();
 	}
 
 	static void SetPath()
@@ -54,13 +54,13 @@ private:
 		inline static std::string path;
 	};
 
-	template <std::uintptr_t ADDR, std::ptrdiff_t OFF>
+	template <std::uintptr_t ID, std::ptrdiff_t OFF>
 	class hkPhotoModePath
 	{
 	public:
 		static void Install()
 		{
-			static REL::Relocation<std::uintptr_t> target{ REL::Offset(ADDR), OFF };
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = SFSE::GetTrampoline();
 			_PhotoModePath = trampoline.write_call<5>(target.address(), PhotoModePath);
 		}
@@ -79,13 +79,13 @@ private:
 		inline static REL::Relocation<decltype(&PhotoModePath)> _PhotoModePath;
 	};
 
-	template <std::uintptr_t ADDR, std::ptrdiff_t OFF>
+	template <std::uintptr_t ID, std::ptrdiff_t OFF>
 	class hkMessageOfTheDayPath
 	{
 	public:
 		static void Install()
 		{
-			static REL::Relocation<std::uintptr_t> target{ REL::Offset(ADDR), OFF };
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = SFSE::GetTrampoline();
 			trampoline.write_call<5>(target.address(), MessageOfTheDayPath);
 		}
@@ -100,13 +100,13 @@ private:
 		}
 	};
 
-	template <std::uintptr_t ADDR, std::ptrdiff_t OFF>
+	template <std::uintptr_t ID, std::ptrdiff_t OFF>
 	class hkDisableLooseFileLocation
 	{
 	public:
 		static void Install()
 		{
-			static REL::Relocation<std::uintptr_t> target{ REL::Offset(ADDR), OFF };
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = SFSE::GetTrampoline();
 			trampoline.write_call<5>(target.address(), DisableLooseFileLocation);
 		}
@@ -130,7 +130,7 @@ DLLEXPORT constinit auto SFSEPlugin_Version = []() noexcept {
 	data.PluginName(Plugin::NAME);
 	data.AuthorName(Plugin::AUTHOR);
 	data.UsesSigScanning(false);
-	data.UsesAddressLibrary(false);
+	data.UsesAddressLibrary(true);
 	data.HasNoStructUse(true);
 	data.IsLayoutDependent(false);
 	data.CompatibleVersions({ SFSE::RUNTIME_LATEST });
