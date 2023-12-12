@@ -20,15 +20,15 @@ class Hooks
 public:
 	static void Install()
 	{
-		hkPhotoModePath<0x1FC5BC0, 0x082>::Install();
-		hkPhotoModePath<0x2199560, 0x31B>::Install();
-		hkPhotoModePath<0x219ACC0, 0x296>::Install();
-		hkPhotoModePath<0x219BD3C, 0x023>::Install();
+		hkPhotoModePath<130787, 0x082>::Install();
+		hkPhotoModePath<139670, 0x31B>::Install();
+		hkPhotoModePath<139689, 0x296>::Install();
+		hkPhotoModePath<139722, 0x023>::Install();
 
-		hkMessageOfTheDayPath<0x2079D10, 0x2C1>::Install();
-		hkMessageOfTheDayPath<0x207A690, 0x14B>::Install();
+		hkMessageOfTheDayPath<134324, 0x2C1>::Install();
+		hkMessageOfTheDayPath<134326, 0x14B>::Install();
 
-		hkDisableLooseFileLocation<0x350A1A0, 0x172>::Install();
+		hkDisableLooseFileLocation<211739, 0x172>::Install();
 	}
 
 	static void SetPath()
@@ -60,7 +60,7 @@ private:
 	public:
 		static void Install()
 		{
-			static REL::Relocation<std::uintptr_t> target{ REL::Offset(ID), OFF };
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = SFSE::GetTrampoline();
 			_PhotoModePath = trampoline.write_call<5>(target.address(), PhotoModePath);
 		}
@@ -85,7 +85,7 @@ private:
 	public:
 		static void Install()
 		{
-			static REL::Relocation<std::uintptr_t> target{ REL::Offset(ID), OFF };
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = SFSE::GetTrampoline();
 			trampoline.write_call<5>(target.address(), MessageOfTheDayPath);
 		}
@@ -106,7 +106,7 @@ private:
 	public:
 		static void Install()
 		{
-			static REL::Relocation<std::uintptr_t> target{ REL::Offset(ID), OFF };
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = SFSE::GetTrampoline();
 			trampoline.write_call<5>(target.address(), DisableLooseFileLocation);
 		}
@@ -130,9 +130,9 @@ DLLEXPORT constinit auto SFSEPlugin_Version = []() noexcept {
 	data.PluginName(Plugin::NAME);
 	data.AuthorName(Plugin::AUTHOR);
 	data.UsesSigScanning(false);
-	data.UsesAddressLibrary(false);
+	data.UsesAddressLibrary(true);
 	data.HasNoStructUse(true);
-	data.IsLayoutDependent(false);
+	data.IsLayoutDependent(true);
 	data.CompatibleVersions({ SFSE::RUNTIME_LATEST });
 
 	return data;
