@@ -21,11 +21,11 @@ public:
 	static void Install()
 	{
 		hkPhotoModePath<130787, 0x082>::Install();
-		hkPhotoModePath<139670, 0x31B>::Install();
-		hkPhotoModePath<139689, 0x296>::Install();
+		hkPhotoModePath<139670, 0x32C>::Install();
+		hkPhotoModePath<139689, 0x2A7>::Install();
 		hkPhotoModePath<139722, 0x023>::Install();
 
-		hkMessageOfTheDayPath<134324, 0x2C1>::Install();
+		hkMessageOfTheDayPath<134324, 0x239>::Install();
 		hkMessageOfTheDayPath<134326, 0x14B>::Install();
 
 		hkDisableLooseFileLocation<211739, 0x172>::Install();
