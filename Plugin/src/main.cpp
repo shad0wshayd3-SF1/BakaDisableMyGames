@@ -123,7 +123,8 @@ private:
 	};
 };
 
-DLLEXPORT constinit auto SFSEPlugin_Version = []() noexcept {
+DLLEXPORT constinit auto SFSEPlugin_Version = []() noexcept
+{
 	SFSE::PluginVersionData data{};
 
 	data.PluginVersion(Plugin::Version);
@@ -142,12 +143,13 @@ namespace
 {
 	void MessageCallback(SFSE::MessagingInterface::Message* a_msg) noexcept
 	{
-		switch (a_msg->type) {
+		switch (a_msg->type)
+		{
 		case SFSE::MessagingInterface::kPostLoad:
-			{
-				Hooks::Install();
-				break;
-			}
+		{
+			Hooks::Install();
+			break;
+		}
 		default:
 			break;
 		}
@@ -165,13 +167,16 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 	Config::Load();
 	Hooks::SetPath();
 
-	if (!(*Config::General::bMO2Compatibility)) {
+	if (!(*Config::General::bMO2Compatibility))
+	{
 		PWSTR folderPath{ nullptr };
-		if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK) {
+		if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK)
+		{
 			auto path = std::filesystem::path{ folderPath };
 			path /= "My Games/Starfield/Data/"sv;
 
-			if (std::filesystem::exists(path)) {
+			if (std::filesystem::exists(path))
+			{
 				auto data = std::filesystem::path{ Hooks::GetPath() };
 				data /= "Data"sv;
 
@@ -197,7 +202,8 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 DLLEXPORT bool SFSEAPI SFSEPlugin_Load(const SFSE::LoadInterface* a_sfse)
 {
 #ifndef NDEBUG
-	while (!IsDebuggerPresent()) {
+	while (!IsDebuggerPresent())
+	{
 		Sleep(100);
 	}
 #endif
