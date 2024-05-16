@@ -145,7 +145,6 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 	SFSE::Init(a_sfse);
 
 	DKUtil::Logger::Init(Plugin::NAME, std::to_string(Plugin::Version));
-
 	INFO("{} v{} preloaded"sv, Plugin::NAME, Plugin::Version);
 
 	Config::Load();
@@ -186,10 +185,7 @@ DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
 DLLEXPORT bool SFSEAPI SFSEPlugin_Load(const SFSE::LoadInterface* a_sfse)
 {
 #ifndef NDEBUG
-	while (!IsDebuggerPresent())
-	{
-		Sleep(100);
-	}
+	MessageBoxA(NULL, "Loaded. You can now attach the debugger or continue execution.", Plugin::NAME.data(), NULL);
 #endif
 
 	INFO("{} v{} loaded"sv, Plugin::NAME, Plugin::Version);
