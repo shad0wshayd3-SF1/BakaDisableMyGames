@@ -1,20 +1,3 @@
-class Config
-{
-public:
-	class General
-	{
-	public:
-		inline static DKUtil::Alias::Boolean bMO2Compatibility{ "bMO2Compatibility", "General" };
-	};
-
-	static void Load()
-	{
-		static auto MainConfig = COMPILE_PROXY("BakaKillMyGames.ini");
-		MainConfig.Bind(General::bMO2Compatibility, false);
-		MainConfig.Load();
-	}
-};
-
 class Hooks
 {
 public:
@@ -28,7 +11,7 @@ public:
 		hkMessageOfTheDayPath<134324, 0x239>::Install();
 		hkMessageOfTheDayPath<134326, 0x14B>::Install();
 
-		hkDisableLooseFileLocation<211739, 0x172>::Install();
+		hkDisableLooseFileLocation<211739, 0x175>::Install();
 	}
 
 	static void SetPath()
@@ -140,57 +123,18 @@ namespace
 	}
 }
 
-DLLEXPORT void SFSEAPI SFSEPlugin_Preload(const SFSE::LoadInterface* a_sfse)
-{
-	SFSE::Init(a_sfse);
-
-	DKUtil::Logger::Init(Plugin::NAME, std::to_string(Plugin::Version));
-	INFO("{} v{} preloaded"sv, Plugin::NAME, Plugin::Version);
-
-	Config::Load();
-	Hooks::SetPath();
-
-	if (!(*Config::General::bMO2Compatibility))
-	{
-		PWSTR folderPath{ nullptr };
-		if (SHGetKnownFolderPath(FOLDERID_Documents, KNOWN_FOLDER_FLAG::KF_FLAG_DEFAULT, NULL, &folderPath) == S_OK)
-		{
-			auto path = std::filesystem::path{ folderPath };
-			path /= "My Games/Starfield/Data/"sv;
-
-			if (std::filesystem::exists(path))
-			{
-				auto data = std::filesystem::path{ Hooks::GetPath() };
-				data /= "Data"sv;
-
-				static constexpr auto MessageText = std::string_view{
-					"\n\nA Data folder has been detected in Starfield's \"My Games\" folder."sv
-					"\n\nWith this mod installed, the Data folder in Starfield's \"My Games\" folder is disabled. Files located there will not load, including Photo Mode photos shown in the Photo Gallery and during Load Screens."sv
-					"\n\nThe path to this folder is:\n{}\n\nCopy any files contained in that Data folder to the game's Data folder, then delete the Data folder in \"My Games\"."sv
-					"\n\nThe path to the game's Data folder is: \n{}"sv
-					"\n\nWhen you have successfully done this, this message will stop appearing, and you will be able to launch the game."sv
-					"\n\nIf you are using MO2 or the latest Vortex, but still want to use this mod, set bMO2Compatibility in this mod's .ini file to true."sv
-				};
-
-				auto msg = fmt::format(
-					MessageText,
-					path.make_preferred().string(),
-					data.make_preferred().string());
-				REL::stl::report_and_fail(msg);
-			}
-		}
-	}
-}
-
 DLLEXPORT bool SFSEAPI SFSEPlugin_Load(const SFSE::LoadInterface* a_sfse)
 {
 #ifndef NDEBUG
 	MessageBoxA(NULL, "Loaded. You can now attach the debugger or continue execution.", Plugin::NAME.data(), NULL);
 #endif
 
-	INFO("{} v{} loaded"sv, Plugin::NAME, Plugin::Version);
+	SFSE::Init(a_sfse);
 
-	SFSE::AllocTrampoline(1 << 7);
+	DKUtil::Logger::Init(Plugin::NAME, std::to_string(Plugin::Version));
+	INFO("{} v{} loaded", Plugin::NAME, Plugin::Version);
+
+	SFSE::AllocTrampoline(1 << 8);
 	SFSE::GetMessagingInterface()->RegisterListener(MessageCallback);
 
 	return true;
