@@ -12,28 +12,28 @@ public:
 		hkMessageOfTheDayPath<134326, 0x14B>::Install();
 
 		hkDisableLooseFileLocation<211739, 0x175>::Install();
-	}
 
-	static void SetPath()
-	{
-		std::string path;
-		path.resize(260);
-		GetCurrentDirectoryA(path.size(), path.data());
-
-		detail::path.clear();
-		detail::path.append(path.data());
-		detail::path.append("\\");
-	}
-
-	static std::string& GetPath()
-	{
-		return detail::path;
+		detail::BuildPath();
 	}
 
 private:
 	class detail
 	{
 	public:
+		static void BuildPath()
+		{
+			std::string path_t;
+			path_t.resize(260);
+			[[maybe_unused]] auto result =
+				RE::WinAPI::GetCurrentDirectory(
+					static_cast<std::uint32_t>(path_t.size()),
+					path_t.data());
+
+			path.clear();
+			path.append(path_t.data());
+			path.append("\\");
+		}
+
 		inline static std::string path;
 	};
 
