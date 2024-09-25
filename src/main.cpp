@@ -25,7 +25,7 @@ private:
 			std::string path_t;
 			path_t.resize(260);
 			[[maybe_unused]] auto result =
-				RE::WinAPI::GetCurrentDirectory(
+				REX::W32::GetCurrentDirectoryA(
 					static_cast<std::uint32_t>(path_t.size()),
 					path_t.data());
 
@@ -126,9 +126,6 @@ namespace
 SFSEPluginLoad(const SFSE::LoadInterface* a_sfse)
 {
 	SFSE::Init(a_sfse);
-
-	const auto plugin = SFSE::PluginVersionData::GetSingleton();
-	SFSE::log::info("{} {} loaded", plugin->GetPluginName(), plugin->GetPluginVersion());
 
 	SFSE::AllocTrampoline(128);
 	SFSE::GetMessagingInterface()->RegisterListener(MessageCallback);
