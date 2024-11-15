@@ -38,8 +38,8 @@ target("BakaDisableMyGames")
     })
 
     -- add source files
-    add_files("src/*.cpp")
-    add_headerfiles("src/*.h")
+    add_files("src/**.cpp")
+    add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/PCH.h")
 
