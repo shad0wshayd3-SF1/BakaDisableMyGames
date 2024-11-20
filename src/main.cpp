@@ -82,14 +82,17 @@ namespace Hooks
 
 	static void Install()
 	{
+		// Data\\Textures\\Photos
 		hkPhotoModePath<130787, 0x082>::Install();
 		hkPhotoModePath<139670, 0x32C>::Install();
 		hkPhotoModePath<139689, 0x2A7>::Install();
 		hkPhotoModePath<139722, 0x023>::Install();
 
+		// Data/Textures/Motd_Media/
 		hkMessageOfTheDayPath::Install<134324, 0x239>();
 		hkMessageOfTheDayPath::Install<134326, 0x14B>();
 
+		// BSWinPCGameDataSystemUtility
 		hkDisableLooseFileLocation::Install<211739, 0x175>();
 	}
 };
