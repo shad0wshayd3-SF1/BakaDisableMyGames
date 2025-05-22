@@ -6,7 +6,7 @@ includes("lib/commonlibsf")
 
 -- set project
 set_project("BakaDisableMyGames")
-set_version("5.0.0")
+set_version("6.0.0")
 set_license("GPL-3.0")
 
 -- set defaults

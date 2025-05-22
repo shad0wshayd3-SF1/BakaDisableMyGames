@@ -7,10 +7,8 @@ namespace Hooks
 			static std::string path;
 			if (path.empty())
 			{
-				std::string path_t(REX::W32::MAX_PATH, 0);
-				REX::W32::GetCurrentDirectoryA(static_cast<std::uint32_t>(path_t.size()), path_t.data());
-				path.append(path_t.data());
-				path.append("\\");
+				auto root = std::filesystem::current_path();
+				path = root.make_preferred().string() + '\\';
 			}
 
 			return path.c_str();
@@ -18,28 +16,15 @@ namespace Hooks
 
 		static auto GetPath(std::string_view a_append)
 		{
-			auto fs_path = std::filesystem::path{ GetPath() };
-			fs_path /= a_append;
-
 			static std::string path;
-			path = fs_path.make_preferred().string();
+			if (path.empty())
+			{
+				auto root = std::filesystem::current_path();
+				root /= a_append;
+				path = root.make_preferred().string();
+			}
+
 			return path.c_str();
-		}
-	}
-
-	namespace hkMessageOfTheDayPath
-	{
-		static void MessageOfTheDayPath(char* a_destination)
-		{
-			auto path = detail::GetPath("Data/Textures/MOTD_Media/"sv);
-			strcpy_s(a_destination, 260, path);
-		}
-
-		template <std::uintptr_t ID, std::ptrdiff_t OFF>
-		static void Install()
-		{
-			static REL::Relocation target{ REL::ID(ID), OFF };
-			target.write_call<5>(MessageOfTheDayPath);
 		}
 	}
 
@@ -51,75 +36,43 @@ namespace Hooks
 			return strcpy_s(a_destination, a_size, path);
 		}
 
-		template <std::uintptr_t ID, std::ptrdiff_t OFF>
-		static void Install()
-		{
-			static REL::Relocation target{ REL::ID(ID), OFF };
-			target.write_call<5>(DisableLooseFileLocation);
-		}
+		// BSWinPCGameDataSystemUtility
+		inline static REL::Hook _Hook0{ REL::ID(150201), 0x1C2, DisableLooseFileLocation };
 	}
 
-	template <std::uintptr_t ID, std::ptrdiff_t OFF>
-	class hkPhotoModePath :
-		public REX::Singleton<hkPhotoModePath<ID, OFF>>
+	namespace hkMessageOfTheDayPath
 	{
-	public:
-		static void Install()
+		static void MessageOfTheDayPath(char* a_destination)
 		{
-			static REL::Relocation target{ REL::ID(ID), OFF };
-			_PhotoModePath = target.write_call<5>(PhotoModePath);
+			auto path = detail::GetPath("Data/Textures/MOTD_Media/"sv);
+			strcpy_s(a_destination, 260, path);
 		}
-
-	private:
-		static void PhotoModePath(char* a_destination, std::size_t a_size, const char* a_source, const char*, const char* a_vArg2)
-		{
-			auto path = detail::GetPath();
-			return _PhotoModePath(a_destination, a_size, a_source, path, a_vArg2);
-		}
-
-		inline static REL::Relocation<decltype(&PhotoModePath)> _PhotoModePath;
-	};
-
-	static void Install()
-	{
-		// Data\\Textures\\Photos
-		hkPhotoModePath<130787, 0x082>::Install();
-		hkPhotoModePath<139670, 0x32C>::Install();
-		hkPhotoModePath<139689, 0x2A7>::Install();
-		hkPhotoModePath<139722, 0x023>::Install();
 
 		// Data/Textures/Motd_Media/
-		hkMessageOfTheDayPath::Install<134324, 0x239>();
-		hkMessageOfTheDayPath::Install<134326, 0x14B>();
-
-		// BSWinPCGameDataSystemUtility
-		hkDisableLooseFileLocation::Install<211739, 0x175>();
+		inline static REL::Hook _Hook0{ REL::ID(87384), 0x168, MessageOfTheDayPath };
+		inline static REL::Hook _Hook1{ REL::ID(87387), 0x0F3, MessageOfTheDayPath };
 	}
-};
 
-namespace
-{
-	void MessageCallback(SFSE::MessagingInterface::Message* a_msg) noexcept
+	class hkPhotoModePath :
+		public REX::Singleton<hkPhotoModePath>
 	{
-		switch (a_msg->type)
+	private:
+		static void PhotoModePath(char* a_destination, std::size_t a_size, const char* a_source, const char*, const char* a_arg)
 		{
-		case SFSE::MessagingInterface::kPostLoad:
-		{
-			Hooks::Install();
-			break;
+			auto path = detail::GetPath();
+			return _Hook0(a_destination, a_size, a_source, path, a_arg);
 		}
-		default:
-			break;
-		}
-	}
-}
+
+		// Data\\Textures\\Photos
+		inline static REL::Hook _Hook0{ REL::ID(84430), 0x316, PhotoModePath };
+		inline static REL::Hook _Hook1{ REL::ID(84457), 0x085, PhotoModePath };
+		inline static REL::Hook _Hook2{ REL::ID(92021), 0x04E, PhotoModePath };
+		inline static REL::Hook _Hook3{ REL::ID(114073), 0x3D8, PhotoModePath };
+	};
+};
 
 SFSEPluginLoad(const SFSE::LoadInterface* a_sfse)
 {
-	SFSE::Init(a_sfse);
-
-	SFSE::AllocTrampoline(128);
-	SFSE::GetMessagingInterface()->RegisterListener(MessageCallback);
-
+	SFSE::Init(a_sfse, { .trampoline = true });
 	return true;
 }
